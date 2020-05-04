@@ -9,41 +9,11 @@ cmake_policy(SET CMP0042 NEW)
 set(QUAZIP_LIB_VERSION 1.0.0)
 set(QUAZIP_LIB_SOVERSION 1)
 
-option(BUILD_WITH_QT4 "Build QuaZip with Qt4 no matter if Qt5 was found" OFF)
-
 include(GNUInstallDirs)
 
-if(NOT BUILD_WITH_QT4)
-    # try Qt5 first, and prefer that if found
-    find_package(Qt5Core QUIET)
-endif()
+find_package(Qt5 COMPONENTS Core REQUIRED)
 
-if(Qt5Core_FOUND)
-    set(CMAKE_CXX_STANDARD 11)
-    set(QTCORE_LIBRARIES ${Qt5Core_LIBRARIES})
-    set(QUAZIP_LIB_VERSION_PREFIX Qt5)
-    # if there is no QT_ROOT, try to deduce it from Qt QtCore include
-    if("${QT_ROOT}" STREQUAL "")
-        set(QT_ROOT ${QT_QTCORE_INCLUDE_DIR}/../..)
-    endif()
-    include_directories(${Qt5Core_INCLUDE_DIRS})
-
-    macro(qt_wrap_cpp)
-        qt5_wrap_cpp(${ARGN})
-    endmacro()
-else()
-    set(qt_min_version "4.5.0")
-    find_package(Qt4 REQUIRED)
-    set(QT_USE_QTGUI false)
-    include(${QT_USE_FILE})
-    include_directories(${QT_INCLUDES})
-    set(QTCORE_LIBRARIES ${QT_QTCORE_LIBRARY})
-    set(QUAZIP_LIB_VERSION_PREFIX Qt)
-
-    macro(qt_wrap_cpp)
-        qt4_wrap_cpp(${ARGN})
-    endmacro()
-endif()
+set(CMAKE_CXX_STANDARD 11)
 
 #------------------------------------------------------------------------------
 # Submodules
@@ -71,10 +41,6 @@ endif()
 add_subdirectory(zlib)
 include_directories(zlib)
 #------------------------------------------------------------------------------
-
-set(QUAZIP_LIB_TARGET_NAME ${QUAZIP_LIB_VERSION_PREFIX}Quazip CACHE
-    INTERNAL "Target name of libquazip" FORCE)
-
 add_subdirectory(quazip)
 
 if(UNIX AND NOT APPLE)
