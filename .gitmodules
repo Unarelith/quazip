@@ -1,0 +1,4 @@
+[submodule "zlib"]
+	path = zlib
+	url = git://github.com/Unarelith/zlib.git
+	ignore = dirty
